@@ -3,18 +3,22 @@
     - name: download tomcat from dlcdn
       get_url:
         url: "https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.109/bin/apache-tomcat-9.0.109.tar.gz"
-        dest: "/root/"
+        dest: "/root/apache-tomcat-9.0.109.tar.gz"
 
     - name: untar the apache file
-      command: tar -zxvf apache-tomcat-9.0.109.tar.gz
-
+      command: tar -zxvf /root/apache-tomcat-9.0.109.tar.gz -C /root/
 
     - name: rename the tomcat
-      command: mv apache-tomcat-9.0.109 tomcat
+      command: mv /root/apache-tomcat-9.0.109 /root/tomcat
+      args:
+        removes: /root/apache-tomcat-9.0.109
+        creates: /root/tomcat
       tags: abc
 
     - name: install java
-      command: yum install java-1.8.0-openjdk -y
+      yum:
+        name: java-1.8.0-openjdk
+        state: present
 
     - name: setting the roles in tomcat-user.xml file
       template:
@@ -28,3 +32,5 @@
 
     - name: start the tomcat
       shell: nohup /root/tomcat/bin/startup.sh
+      args:
+        chdir: /root/tomcat/bin
