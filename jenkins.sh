@@ -42,6 +42,3 @@ echo "Initial Jenkins Admin Password"
 echo "=============================="
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 
-echo ""
-echo "Jenkins URL:"
-echo "http://<EC2-PUBLIC-IP>:8080"
