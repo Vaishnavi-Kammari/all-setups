@@ -1,38 +1,31 @@
 
 #!/bin/bash
-set -e
+set -euo pipefail
 
-# 1. Update packages
-sudo apt update -y
+# Install Java 21 and dependencies
+sudo apt-get update
+sudo apt-get install -y fontconfig openjdk-21-jre curl gnupg
 
-# 2. Install Java 21 and required tools
-sudo apt install -y fontconfig openjdk-21-jre curl
-
-# 3. Verify Java
-java -version
-
-# 4. Configure the Jenkins LTS signing key
+# Configure Jenkins LTS signing key
 sudo install -d -m 0755 /etc/apt/keyrings
 
-sudo curl -fsSL \
-  https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key \
-  -o /etc/apt/keyrings/jenkins-keyring.asc
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key \
+  | sudo gpg --dearmor --yes \
+      -o /etc/apt/keyrings/jenkins-keyring.gpg
 
-sudo chmod 0644 /etc/apt/keyrings/jenkins-keyring.asc
+sudo chmod 0644 /etc/apt/keyrings/jenkins-keyring.gpg
 
-# 5. Add the Jenkins LTS repository
-echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" \
+# Add Jenkins LTS repository
+echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.gpg] https://pkg.jenkins.io/debian-stable binary/" \
   | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
 
-# 6. Update package lists and install Jenkins
-sudo apt update -y
-sudo apt install -y jenkins
+# Install Jenkins
+sudo apt-get update
+sudo apt-get install -y jenkins
 
-# 7. Start Jenkins and enable it at boot
+# Enable and start Jenkins
 sudo systemctl enable --now jenkins
 
-# 8. Verify Jenkins service
+# Verify installation
+java -version
 sudo systemctl --no-pager --full status jenkins
-
-# 9. Display the initial administrator password
-sudo cat /var/lib/jenkins/secrets/initialAdminPassword
